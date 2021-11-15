@@ -10,7 +10,6 @@ library(shiny)
 library(httr)
 devtools::install_github('uzairjan/lab05_1')
 library("coronaApi")
-library(dplyr)
 library(tidyr)
 library(stringr)
 library(tidyverse)
@@ -19,8 +18,7 @@ library(ggplot2)
 obj <- coronaApi()
 
 newData <- obj$getDailyReportedData('daily')
-newData
-sweden <- as.data.frame(obj$getSingleCountryList('sweden'))
+countryList <- obj$getContrylist()
 
 
 
@@ -34,15 +32,22 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
           h5("This application used to retrieve covid-19 data from r package coronaApi
-             which provide daily, overAll result of corona about corona")
+             which provide daily, overAll result of corona about corona"),
+          selectInput(
+              inputId = "var",
+              label = "Select country",
+              choices = countryList,
+              br(),
+          ),
         ),
+        
         # Show a plot of the generated distribution
         mainPanel(
             tabsetPanel(
                 type = 'tab',
+                tabPanel("Country Wise", plotOutput('swed')),
                 tabPanel("plots",  plotOutput("distPlot")),
-                        
-                tabPanel("corona in Sweden", plotOutput('swed')),
+               
                 tabPanel("Summary", verbatimTextOutput("summary")),
                 tabPanel("Structure",verbatimTextOutput("str")),
                 tabPanel("Data", tableOutput("data"))
@@ -78,7 +83,10 @@ server <- function(input, output) {
     })
     
     output$swed <- renderPlot({
-
+        country <- as.character(input$var)
+        print('contry print')
+        print(country)
+        sweden <- as.data.frame(obj$getSingleCountryList(country))
 
         sweden <- sweden %>%
             gather(key=Type, value=Score, recovered,deaths,confirmed)

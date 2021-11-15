@@ -6,9 +6,9 @@
 #
 #    http://shiny.rstudio.com/
 #
-
 library(shiny)
 library(httr)
+devtools::install_github('uzairjan/lab05_1')
 library("coronaApi")
 library(dplyr)
 library(tidyr)
